@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AutoPark Login</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: url('https://scontent.fmnl34-1.fna.fbcdn.net/v/t1.15752-9/496626870_732719235831478_8437908227144851153_n.jpg?stp=dst-jpg_s480x480_tt6&_nc_cat=106&ccb=1-7&_nc_sid=0024fc&_nc_eui2=AeGR_bJ6D3uQb2iyd3bbJysyybCr7yNKUP3JsKvvI0pQ_SyBbdowxFqg97xRZiW9Gz249p2ob14o8lx8YTdXvzq7&_nc_ohc=kTvmxnme2OMQ7kNvwGHC-tu&_nc_oc=AdlC5-OYva-wb-f5JZx5iM3M1tsBdy2PLlLcviMxV48O78aChcB5n1iML7un0i85SRi0ZefoCptbSQXAXnhEP_GL&_nc_ad=z-m&_nc_cid=5917&_nc_zt=23&_nc_ht=scontent.fmnl34-1.fna&oh=03_Q7cD2gHHaQvjvmX_BOjiMzla5cwbOYy49nn7SaPuCjSxQUUzmg&oe=6886AD24') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .login-container {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 0 15px rgb(0, 30, 255);
+            text-align: center;
+            width: 350px;
+        }
+
+        .login-container img {
+            width: 80px;
+            margin-bottom: 20px;
+        }
+
+        .login-container h2 {
+            color: rgb(30, 0, 255);
+            margin-bottom: 25px;
+        }
+
+        .login-container form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .login-container input {
+            padding: 10px;
+            border: 1px solid rgb(55, 0, 255);
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: white;
+        }
+
+        .login-container button {
+            background-color: rgb(76, 0, 255);
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            color: black;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .login-container button:hover {
+            background-color: #5500ff;
+        }
+
+        .login-container a {
+            color: rgb(0, 4, 255);
+            text-decoration: none;
+        }
+
+        .login-container a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <img src="https://scontent.fmnl34-1.fna.fbcdn.net/v/t1.15752-9/496626870_732719235831478_8437908227144851153_n.jpg?stp=dst-jpg_s480x480_tt6&_nc_cat=106&ccb=1-7&_nc_sid=0024fc&_nc_eui2=AeGR_bJ6D3uQb2iyd3bbJysyybCr7yNKUP3JsKvvI0pQ_SyBbdowxFqg97xRZiW9Gz249p2ob14o8lx8YTdXvzq7&_nc_ohc=kTvmxnme2OMQ7kNvwGHC-tu&_nc_oc=AdlC5-OYva-wb-f5JZx5iM3M1tsBdy2PLlLcviMxV48O78aChcB5n1iML7un0i85SRi0ZefoCptbSQXAXnhEP_GL&_nc_ad=z-m&_nc_cid=5917&_nc_zt=23&_nc_ht=scontent.fmnl34-1.fna&oh=03_Q7cD2gHHaQvjvmX_BOjiMzla5cwbOYy49nn7SaPuCjSxQUUzmg&oe=6886AD24" alt="AutoPark Logo">
+        <h2>Login</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Login</button>
+        </form>
+        <p>Don’t have an account? <a href="{% url 'signup' %}">Sign up</a></p>
+         <button onclick="window.location.href='/adminlogin'">Admin Login</button>
+
+    </div>
+</body>
+</html>

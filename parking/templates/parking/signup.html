@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AutoPark - Sign Up</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: url('https://thumbs.dreamstime.com/b/cars-parked-outdoor-parking-lot-background-ai-generated-345625988.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .signup-box {
+            background-color: rgba(0, 0, 0, 0.85);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 15px #ff9800;
+            width: 400px;
+            color: white;
+            text-align: center;
+        }
+
+        .signup-box h2 {
+            color: #ff9800;
+            margin-bottom: 20px;
+        }
+
+        .signup-box form input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .signup-box button {
+            background-color: #ff9800;
+            color: black;
+            padding: 10px 20px;
+            border: none;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .signup-box button:hover {
+            background-color: #e68900;
+        }
+
+        .signup-box a {
+            color: #ff9800;
+            text-decoration: none;
+        }
+
+        .logo {
+            width: 100px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-box">
+        <img src="https://static.vecteezy.com/system/resources/previews/016/774/584/non_2x/3d-parking-icon-on-transparent-background-free-png.png" alt="AutoPark Logo" class="logo">
+        <h2>Create an Account</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Sign Up</button>
+        </form>
+        <p>Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+    </div>
+</body>
+</html>

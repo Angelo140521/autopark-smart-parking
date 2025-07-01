@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AutoPark: Dashboard</title>
+    <meta http-equiv="refresh" content="2"> <!-- Auto-refresh every 2s -->
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(to right, #000000, #2c2c2c);
+            color: white;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #333;
+            padding: 15px 30px;
+        }
+
+        .navbar .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: orange;
+        }
+
+        .navbar ul {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .navbar li a {
+            color: lightgray;
+            text-decoration: none;
+            font-size: 16px;
+            padding: 8px 14px;
+            border-radius: 6px;
+            transition: 0.3s;
+        }
+
+        .navbar li a:hover {
+            background-color: orange;
+            color: black;
+        }
+
+        .dashboard {
+            padding: 40px;
+        }
+
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: orange;
+        }
+
+        .slots {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .slot-card {
+            width: 180px;
+            height: 130px;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+
+        .available {
+            background-color: green;
+        }
+
+        .occupied {
+            background-color: red;
+        }
+
+        .reserved {
+            background-color: darkred;
+        }
+
+        .reserve-btn {
+            margin-top: 10px;
+            padding: 5px 10px;
+            background-color: orange;
+            color: black;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .timer {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="logo">AutoPark</div>
+        <ul>
+            <li><a href="#"></a></li>
+            <li><a href="{% url 'history' %}">History</a></li>
+            <li><a href="{% url 'login' %}">Logout</a></li>
+        </ul>
+    </div>
+
+    <div class="dashboard">
+        <h1>AutoPark: Parking Slot Status</h1>
+        <h2>Welcome, {{ request.user.username }}</h2>
+
+        <div class="slots" id="slots-container">
+            {% for slot in slots %}
+                <div class="slot-card {% if slot.status == 'AVAILABLE' %}available{% elif slot.status == 'OCCUPIED' %}occupied{% else %}reserved{% endif %}" 
+                     data-slot="{{ slot.slot_number }}" 
+                     data-status="{{ slot.status }}">
+                    Slot {{ slot.slot_number }}<br>
+                    <span class="slot-status">{{ slot.status }}</span>
+
+                    {% if slot.status == 'AVAILABLE' %}
+                        <button class="reserve-btn">Reserve</button>
+                    {% endif %}
+                    <div class="timer"></div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+  <script>
+    let reservedSlot = localStorage.getItem('reservedSlot');
+    const slotTimers = {};
+    const parkingTimers = {};
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const slots = document.querySelectorAll('.slot-card');
+
+        slots.forEach(slot => {
+            const slotId = slot.dataset.slot;
+            const timerDisplay = slot.querySelector('.timer');
+            const reserveBtn = slot.querySelector('.reserve-btn');
+            const statusText = slot.querySelector('.slot-status');
+            const currentStatus = statusText.innerText.trim().toUpperCase();
+
+            const startTimeKey = `parking_start_${slotId}`;
+            const previouslyOccupied = localStorage.getItem(startTimeKey);
+            
+
+            // --- SHOW PAYMENT POPUP WHEN SLOT IS BACK TO AVAILABLE ---
+            if (currentStatus === 'AVAILABLE' && previouslyOccupied) {
+                const endTime = new Date();
+                const startTime = new Date(previouslyOccupied);
+                const elapsedSeconds = Math.floor((endTime - startTime) / 1000);
+                const parkingFee = calculateParkingFee(elapsedSeconds);
+                const mins = Math.floor(elapsedSeconds / 60);
+                const secs = elapsedSeconds % 60;
+
+                // Add ₱5 reservation fee
+                const reservationFee = 5;
+                const totalCost = reservationFee + parkingFee;
+                
+
+                // Store data for payment
+                localStorage.setItem('payment_slot', slotId);
+                localStorage.setItem('payment_time', `${mins}m ${secs}s`);
+                localStorage.setItem('payment_parking_fee', parkingFee);
+                localStorage.setItem('payment_total', totalCost);
+
+                // Ask user to go to payment
+                const proceed = confirm(
+                    `Slot ${slotId} is now available.\n\n` +
+                    `Time Used: ${mins}m ${secs}s\n` +
+                    `Parking Fee: ₱${parkingFee}\n` +
+                    `Reservation Fee: ₱${reservationFee}\n\n` +
+                    `Total Cost: ₱${totalCost}\n\n` +
+                    `Click OK to go to payment page.`
+                );
+
+                if (proceed) {
+                    window.location.href = "/payment/";
+                }
+
+                localStorage.removeItem(startTimeKey);
+            }
+
+            // --- RESERVED SLOT HANDLING ---
+            const storedEndTime = localStorage.getItem(`timer_end_${slotId}`);
+
+            if (reservedSlot === slotId && storedEndTime) {
+                const remainingSeconds = Math.floor((new Date(storedEndTime) - new Date()) / 1000);
+                if (remainingSeconds > 0 && currentStatus === 'AVAILABLE') {
+                    updateSlotToReserved(slot, slotId, statusText, reserveBtn, timerDisplay, remainingSeconds);
+                } else {
+                    localStorage.removeItem(`timer_end_${slotId}`);
+                    localStorage.removeItem('reservedSlot');
+                }
+            }
+
+            // --- OCCUPIED SLOT HANDLING ---
+            // --- OCCUPIED SLOT HANDLING ---
+if (currentStatus === 'OCCUPIED') {
+    // Only show timer if this OCCUPIED slot was previously reserved
+    if (reservedSlot === slotId) {
+        localStorage.removeItem(`timer_end_${slotId}`);
+        localStorage.removeItem('reservedSlot');
+        reservedSlot = null;
+
+        if (!parkingTimers[slotId]) {
+            if (!localStorage.getItem(startTimeKey)) {
+                localStorage.setItem(startTimeKey, new Date().toISOString());
+            }
+
+            const startTime = new Date(localStorage.getItem(startTimeKey));
+            const elapsed = Math.floor((new Date() - startTime) / 1000);
+            startParkingTimer(slotId, timerDisplay, elapsed);
+        }
+    } else {
+        // If occupied but not reserved, hide the timer
+        timerDisplay.textContent = '';
+    }
+}
+
+            // --- RESERVE BUTTON WITH FEE POPUP ---
+            if (reserveBtn) {
+                reserveBtn.addEventListener('click', () => {
+                    if (reservedSlot) {
+                        alert("You have already reserved a slot!");
+                        return;
+                    }
+
+                    const confirmReserve = confirm(`Reserve Slot ${slotId}?\nReservation Fee: ₱5`);
+                    if (!confirmReserve) return;
+
+                    const duration = 60 * 60; // 60 minutes
+                    const endTime = new Date(new Date().getTime() + duration * 1000);
+
+                    localStorage.setItem('reservedSlot', slotId);
+                    localStorage.setItem(`timer_end_${slotId}`, endTime.toISOString());
+
+                    alert(`₱5 Reservation successful for Slot ${slotId}`);
+
+                    updateSlotToReserved(slot, slotId, statusText, reserveBtn, timerDisplay, duration);
+                });
+            }
+        });
+    });
+
+    function updateSlotToReserved(slot, slotId, statusText, reserveBtn, timerDisplay, secondsLeft) {
+        slot.classList.remove('available');
+        slot.classList.add('reserved');
+        if (reserveBtn) reserveBtn.remove();
+        statusText.innerText = 'RESERVED';
+        startTimer(slotId, timerDisplay, secondsLeft);
+    }
+
+    function startTimer(slotId, displayElement, secondsLeft) {
+        if (slotTimers[slotId]) return;
+
+        const interval = setInterval(() => {
+            const mins = Math.floor(secondsLeft / 60);
+            const secs = secondsLeft % 60;
+            displayElement.textContent = `Reserved: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+            secondsLeft--;
+
+            if (secondsLeft < 0) {
+                clearInterval(interval);
+                displayElement.textContent = `Reserved: 00:00`;
+            }
+        }, 1000);
+
+        slotTimers[slotId] = interval;
+    }
+
+    function startParkingTimer(slotId, displayElement, elapsedSeconds) {
+        const interval = setInterval(() => {
+            const mins = Math.floor(elapsedSeconds / 60);
+            const secs = elapsedSeconds % 60;
+
+            const cost = calculateParkingFee(elapsedSeconds);
+            displayElement.textContent = `Occupied: ${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')} | ₱${cost}`;
+            elapsedSeconds++;
+        }, 1000);
+
+        parkingTimers[slotId] = interval;
+    }
+
+    function calculateParkingFee(seconds) {
+        const mins = Math.floor(seconds / 60);
+        if (mins <= 4) return 1;
+        return 1 + Math.floor((mins - 4) / 5) * 2;
+    }
+</script>
+
+
+
+
+
+
+
+</body>
+</html>

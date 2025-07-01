@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Login</title>
+    <style>
+        body {
+            background: linear-gradient(135deg, black, rgb(106, 0, 255));
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .login-box {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 40px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        input {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            width: 200px;
+        }
+        button {
+            padding: 10px 20px;
+            background: rgb(55, 0, 255);
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background: #3700ff;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h1>Admin Login</h1>
+        <input type="password" id="adminPass" placeholder="Enter admin password">
+        <br>
+        <button onclick="checkAdmin()">Login</button>
+    </div>
+    <script>
+        function checkAdmin() {
+            const pass = document.getElementById('adminPass').value;
+            if (pass === 'admin123') {
+                window.location.href = '/adminreport/';
+            } else {
+                alert('Wrong password');
+            }
+        }
+    </script>
+</body>
+</html>

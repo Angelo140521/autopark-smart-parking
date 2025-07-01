@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Report</title>
+</head>
+<body>
+<h1>Admin Report</h1>
+
+<h2>All Parking History</h2>
+<table border="1">
+    <tr>
+        <th>User</th>
+        <th>Slot</th>
+        <th>Date & Time</th>
+        <th>Time Used</th>
+        <th>Parking Fee</th>
+        <th>Reservation Fee</th>
+        <th>Total Cost</th>
+    </tr>
+    {% for entry in histories %}
+    <tr>
+        <td>{{ entry.user.username }}</td>
+        <td>{{ entry.slot_number }}</td>
+        <td>{{ entry.datetime }}</td>
+        <td>{{ entry.time_used }}</td>
+        <td>₱{{ entry.parking_fee }}</td>
+        <td>₱{{ entry.reservation_fee }}</td>
+        <td>₱{{ entry.total_cost }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Total Costs By Date</h2>
+<table border="1">
+    <tr>
+        <th>Date</th>
+        <th>Total Cost</th>
+    </tr>
+    {% for total in totals_by_date %}
+    <tr>
+        <td>{{ total.datetime__date }}</td>
+        <td>₱{{ total.total }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+</body>
+</html>

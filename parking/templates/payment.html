@@ -1,0 +1,85 @@
+<!-- templates/payment.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AutoPark - Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            padding: 50px;
+        }
+        .card {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            margin: auto;
+            text-align: center;
+        }
+        .price {
+            font-size: 28px;
+            color: #00ff99;
+            margin-top: 20px;
+        }
+        button {
+            background: #00ff99;
+            color: #111;
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            margin-top: 20px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #00cc77;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Payment Summary</h1>
+        <p id="slotInfo">Slot: -</p>
+        <p id="timeUsed">Time Used: -</p>
+        <p id="parkingFee">Parking Fee: -</p>
+        <p>Reservation Fee: ₱5</p>
+        <p class="price" id="totalCost">Total: ₱-</p>
+
+        <button id="payBtn">Pay Now</button>
+    </div>
+
+    <script>
+        const slot = localStorage.getItem('payment_slot') || 'Unknown';
+        const time = localStorage.getItem('payment_time') || '0 mins';
+        const fee = localStorage.getItem('payment_parking_fee') || '0';
+        const total = localStorage.getItem('payment_total') || '5';
+
+        document.getElementById('slotInfo').textContent = `Slot: ${slot}`;
+        document.getElementById('timeUsed').textContent = `Time Used: ${time}`;
+        document.getElementById('parkingFee').textContent = `Parking Fee: ₱${fee}`;
+        document.getElementById('totalCost').textContent = `Total: ₱${total}`;
+
+        document.getElementById('payBtn').addEventListener('click', function () {
+            // Add to local history
+            const history = JSON.parse(localStorage.getItem('parking_history')) || [];
+            history.push({
+                slotId: slot,
+                datetime: new Date().toLocaleString(),
+                timeUsed: time,
+                parkingFee: fee,
+                reservationFee: 5,
+                totalCost: total
+            });
+            localStorage.setItem('parking_history', JSON.stringify(history));
+
+            alert("Payment successful!\nRedirecting to Dashboard in 5 seconds...");
+            setTimeout(() => {
+                window.location.href = "/dashboard/";
+            }, 5000);
+        });
+    </script>
+</body>
+</html>

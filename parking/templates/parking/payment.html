@@ -1,0 +1,86 @@
+<!-- templates/payment.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AutoPark - Payment</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #111;
+            color: white;
+            padding: 50px;
+        }
+        .card {
+            background: #222;
+            padding: 20px;
+            border-radius: 10px;
+            width: 400px;
+            margin: auto;
+            text-align: center;
+        }
+        .price {
+            font-size: 28px;
+            color: #00ff99;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>Payment Summary</h1>
+        <p id="slotInfo"></p>
+        <p id="timeUsed"></p>
+        <p id="parkingFee"></p>
+        <p>Reservation Fee: ₱5</p>
+        <p class="price" id="totalCost"></p>
+
+        <button onclick="alert('Simulated payment complete')">Pay Now</button>
+    </div>
+
+    <script>
+    // Example: called after successful payment
+    function saveToHistory() {
+        const slot = localStorage.getItem('payment_slot');
+        const timeUsed = localStorage.getItem('payment_time');
+        const parkingFee = localStorage.getItem('payment_parking_fee');
+        const totalCost = localStorage.getItem('payment_total');
+        const reservationFee = 5;
+        const now = new Date().toLocaleString();
+
+        const newEntry = {
+            slot: slot,
+            datetime: now,
+            time_used: timeUsed,
+            parking_fee: parkingFee,
+            reservation_fee: reservationFee,
+            total_cost: totalCost
+        };
+
+        const history = JSON.parse(localStorage.getItem('parking_history')) || [];
+        history.push(newEntry);
+        localStorage.setItem('parking_history', JSON.stringify(history));
+
+        // OPTIONAL: Clear payment info after saving
+        localStorage.removeItem('payment_slot');
+        localStorage.removeItem('payment_time');
+        localStorage.removeItem('payment_parking_fee');
+        localStorage.removeItem('payment_total');
+    }
+
+    // Example trigger after paying
+    document.getElementById("pay-now-btn").addEventListener("click", function () {
+        alert("Payment successful!");
+
+        // Save to history
+        saveToHistory();
+
+        // Redirect after 5 seconds
+        setTimeout(() => {
+            window.location.href = "/dashboard/";
+        }, 5000);
+    });
+</script>
+
+</body>
+</html>

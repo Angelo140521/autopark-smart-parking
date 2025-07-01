@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>3D Burger with Name</title>
+  <style>
+    body { margin: 0; }
+    canvas { display: block; }
+  </style>
+</head>
+<body>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/examples/js/loaders/FontLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/examples/js/geometries/TextGeometry.js"></script>
+
+  <script>
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    // Lighting
+    const light = new THREE.DirectionalLight(0xffffff, 1);
+    light.position.set(0, 2, 2).normalize();
+    scene.add(light);
+
+    // Burger parts
+    const createPart = (color, radius, height, y) => {
+      const geometry = new THREE.CylinderGeometry(radius, radius, height, 32);
+      const material = new THREE.MeshPhongMaterial({ color });
+      const part = new THREE.Mesh(geometry, material);
+      part.position.y = y;
+      return part;
+    };
+
+    const bottomBun = createPart(0xdeb887, 1.0, 0.3, -0.5);
+    const patty = createPart(0x552200, 0.9, 0.2, 0);
+    const lettuce = createPart(0x228B22, 0.95, 0.1, 0.2);
+    const topBun = createPart(0xdeb887, 1.0, 0.3, 0.5);
+
+    scene.add(bottomBun, patty, lettuce, topBun);
+
+    // Load font and create text
+    const loader = new THREE.FontLoader();
+    loader.load('https://cdn.jsdelivr.net/npm/three@0.154.0/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+      const textGeo = new THREE.TextGeometry('AutoPark', {
+        font: font,
+        size: 0.2,
+        height: 0.05,
+      });
+      const textMat = new THREE.MeshPhongMaterial({ color: 0x000000 });
+      const textMesh = new THREE.Mesh(textGeo, textMat);
+      textMesh.position.set(-0.5, 0.05, 0);
+      scene.add(textMesh);
+    });
+
+    camera.position.z = 3;
+
+    function animate() {
+      requestAnimationFrame(animate);
+      scene.rotation.y += 0.005;
+      renderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
+</body>
+</html>

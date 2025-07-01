@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parking History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background: #333;
+            color: white;
+        }
+
+        .back-button-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .back-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background-color: orange;
+            color: black;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Parking History</h2>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Slot</th>
+                <th>Date & Time</th>
+                <th>Time Used</th>
+                <th>Parking Fee</th>
+                <th>Reservation Fee</th>
+                <th>Total Cost</th>
+            </tr>
+        </thead>
+        <tbody id="history-table"></tbody>
+    </table>
+
+    <!-- Back Button -->
+    <div class="back-button-container">
+        <a href="/dashboard/" class="back-button">← Back to Dashboard</a>
+    </div>
+
+    <script>
+        const historyData = JSON.parse(localStorage.getItem('parking_history')) || [];
+        const table = document.getElementById('history-table');
+
+        historyData.forEach(entry => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${entry.slotId}</td>
+                <td>${entry.datetime}</td>
+                <td>${entry.timeUsed}</td>
+                <td>₱${entry.parkingFee}</td>
+                <td>₱${entry.reservationFee}</td>
+                <td>₱${entry.totalCost}</td>
+            `;
+            table.appendChild(row);
+        });
+    </script>
+</body>
+</html>

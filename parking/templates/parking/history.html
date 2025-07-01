@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Parking History</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            padding: 20px;
+        }
+        h2 {
+            text-align: center;
+        }
+        table {
+            width: 90%;
+            margin: auto;
+            border-collapse: collapse;
+            background: #fff;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background: #333;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h2>Parking History</h2>
+    <table border="1">
+    <thead>
+        <tr>
+            <th>Slot</th>
+            <th>Date & Time</th>
+            <th>Time Used</th>
+            <th>Parking Fee</th>
+            <th>Reservation Fee</th>
+            <th>Total Cost</th>
+        </tr>
+    </thead>
+    <tbody id="history-table"></tbody>
+</table>
+<body>
+    <a href="/dashboard/" style="
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: bold;
+">
+    ⬅ Back to Dashboard
+</a>
+<button onclick="localStorage.removeItem('parking_history'); location.reload();">Clear History</button>
+<script>
+        // Load history from localStorage
+        const history = JSON.parse(localStorage.getItem("parking_history")) || [];
+
+        const tableBody = document.querySelector("#history-table tbody");
+
+        if (history.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='7'>No parking history found.</td></tr>";
+        } else {
+            history.forEach(entry => {
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${entry.slot}</td>
+                    <td>${entry.date}</td>
+                    <td>${entry.time}</td>
+                    <td>${entry.duration}</td>
+                    <td>${entry.parking_fee}</td>
+                    <td>${entry.reservation_fee}</td>
+                    <td>${entry.total}</td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+        }
+    </script>
+</body>
+</html>
